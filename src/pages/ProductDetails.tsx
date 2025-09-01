@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Heart, Star, Share, Minus, Plus, ShoppingCart } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Heart, Star, Share, Minus, Plus, ShoppingCart, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -8,44 +8,98 @@ import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import Footer from "@/components/Footer";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { useProducts } from "@/hooks/useProducts";
+import { toast } from "@/hooks/use-toast";
 import humidifierImg from "@/assets/humidifier.jpg";
 import smartwatchImg from "@/assets/smartwatch.jpg";
 
 const ProductDetails = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
+  const { getProductById } = useProducts();
+  
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedColor, setSelectedColor] = useState("wooden");
+  const [selectedColor, setSelectedColor] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [couponCode, setCouponCode] = useState("");
 
-  // Mock product data - in real app, fetch based on id
-  const product = {
-    id: "1",
-    name: "Rain Cloud Night Light Humidifier with Raining Water Drop Sound Oil Diffuser for Bedroom",
-    price: 1850,
-    originalPrice: 2000,
-    rating: 4.5,
-    reviews: 32,
-    images: [humidifierImg, smartwatchImg, humidifierImg, smartwatchImg],
-    description: `Rain Cloud Night Light Humidifier with Raining Water Drop Sound Oil Diffuser for Bedroom
-Cloud Rain Humidifier আপনার রুমকে দেয় নিখুঁত আর্দ্রতা।
-এটি রাতে একটি অপূর্ব সুন্দর আলো দেয়, যা পরিবেশটাকে সাজায় চান্দনী
-রাতের মতো সুন্দর পরিবেশ সৃষ্টি করে।
+  useEffect(() => {
+    if (id) {
+      loadProduct(id);
+    }
+  }, [id]);
 
-এটি এক অনন্য এবং আকর্ষণীয় ডিজাইনের সাথে আসে যা আপনার
-পরিবেশকে আরো সুন্দর ও ইউনিক করে তুলবে।
-
-এটি ব্যবহারে খুবই সহজ। আপনাকে শুধু পানি ঢালতে হবে।`,
-    colors: [
-      { name: "Wooden", value: "wooden", color: "#D4A574" },
-      { name: "White", value: "white", color: "#FFFFFF" },
-      { name: "Black", value: "black", color: "#000000" },
-    ],
-    stock: 4,
-    deliveryTime: "3-5",
+  const loadProduct = async (productId: string) => {
+    setLoading(true);
+    try {
+      const productData = await getProductById(productId);
+      if (productData) {
+        setProduct(productData);
+        setSelectedColor(productData.colors?.[0] || '');
+        setSelectedSize(productData.sizes?.[0] || '');
+      }
+    } catch (error) {
+      toast({
+        title: "ত্রুটি",
+        description: "পণ্যের তথ্য লোড করতে সমস্যা হয়েছে।",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-4" />
+            <p>লোড হচ্ছে...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">পণ্য পাওয়া যায়নি</h1>
+            <Link to="/shop">
+              <Button>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                শপে ফিরে যান
+              </Button>
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const discountPercentage = product.discount_price 
+    ? Math.round(((product.price - product.discount_price) / product.price) * 100)
+    : 0;
+
+  const finalPrice = product.discount_price || product.price;
+  const totalPrice = finalPrice * quantity;
+
+  // Default images if none provided
+  const productImages = product.image_urls && product.image_urls.length > 0 
+    ? product.image_urls 
+    : [smartwatchImg, humidifierImg];
+
+  // Mock recommended products - in real app, fetch related products
   const recommendedProducts = [
     {
       id: "2",
@@ -67,7 +121,7 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
       image: humidifierImg,
     },
     {
-      id: "4",
+      id: "4", 
       name: "5G Smart Watch",
       price: 799,
       originalPrice: 999,
@@ -86,8 +140,6 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
     },
   ];
 
-  const discountPercent = Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -98,7 +150,7 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
           <div>
             <div className="relative mb-4">
               <img
-                src={product.images[selectedImage]}
+                src={productImages[selectedImage]}
                 alt={product.name}
                 className="w-full h-96 object-cover rounded-lg"
               />
@@ -111,7 +163,7 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
               </Button>
             </div>
             <div className="grid grid-cols-4 gap-2">
-              {product.images.map((image, index) => (
+              {productImages.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -135,9 +187,13 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
             
             {/* Price */}
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-3xl font-bold text-primary">৳ {product.price}</span>
-              <span className="text-lg text-muted-foreground line-through">৳ {product.originalPrice}</span>
-              <Badge className="bg-primary text-primary-foreground">-{discountPercent}%</Badge>
+              <span className="text-3xl font-bold text-primary">৳ {finalPrice.toLocaleString()}</span>
+              {product.discount_price && (
+                <>
+                  <span className="text-lg text-muted-foreground line-through">৳ {product.price.toLocaleString()}</span>
+                  <Badge className="bg-primary text-primary-foreground">-{discountPercentage}%</Badge>
+                </>
+              )}
             </div>
 
             {/* Rating */}
@@ -147,56 +203,73 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
                   <Star
                     key={i}
                     className={`w-4 h-4 ${
-                      i < Math.floor(product.rating)
-                        ? "text-yellow-400 fill-yellow-400"
-                        : "text-gray-300"
+                      i < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
                     }`}
                   />
                 ))}
               </div>
               <span className="text-sm text-muted-foreground">
-                {product.rating} ({product.reviews} reviews)
+                4.5 (32 reviews)
               </span>
             </div>
 
-            {/* Available Variant */}
-            <div className="mb-4">
-              <h3 className="font-medium mb-2">Available variant:</h3>
-              <div className="flex gap-2">
-                {product.colors.map((color) => (
-                  <button
-                    key={color.value}
-                    onClick={() => setSelectedColor(color.value)}
-                    className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm transition-colors ${
-                      selectedColor === color.value
-                        ? "border-primary bg-primary/10"
-                        : "border-gray-200 hover:border-primary"
-                    }`}
-                  >
-                    <div
-                      className="w-4 h-4 rounded-full border"
-                      style={{ backgroundColor: color.color }}
-                    />
-                    {color.name}
-                  </button>
-                ))}
+            {/* Colors */}
+            {product.colors && product.colors.length > 0 && (
+              <div className="mb-4">
+                <h3 className="font-medium mb-2">রং নির্বাচন করুন:</h3>
+                <div className="flex gap-2">
+                  {product.colors.map((color, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedColor(color)}
+                      className={`px-3 py-2 border rounded-lg text-sm transition-colors ${
+                        selectedColor === color
+                          ? "border-primary bg-primary/10"
+                          : "border-gray-200 hover:border-primary"
+                      }`}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-1">Stock: {product.stock}</p>
-            </div>
+            )}
+
+            {/* Sizes */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="mb-4">
+                <h3 className="font-medium mb-2">সাইজ নির্বাচন করুন:</h3>
+                <div className="flex gap-2">
+                  {product.sizes.map((size, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedSize(size)}
+                      className={`px-3 py-2 border rounded-lg text-sm transition-colors ${
+                        selectedSize === size
+                          ? "border-primary bg-primary/10"
+                          : "border-gray-200 hover:border-primary"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Stock Status */}
             <div className="mb-4">
               <Badge variant="secondary" className="bg-success/10 text-success">
-                In Stock
+                স্টকে আছে ({product.stock_quantity} টি)
               </Badge>
               <p className="text-sm text-muted-foreground mt-1">
-                Delivery time: {product.deliveryTime} days
+                ডেলিভারি সময়: ৩-৫ দিন
               </p>
             </div>
 
             {/* Quantity */}
             <div className="mb-6">
-              <h3 className="font-medium mb-2">Quantity</h3>
+              <h3 className="font-medium mb-2">পরিমাণ</h3>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -219,6 +292,9 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                মোট: ৳ {totalPrice.toLocaleString()}
+              </p>
             </div>
 
             {/* Special Offer */}
@@ -235,33 +311,33 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
 
             {/* Discount Coupon */}
             <div className="mb-6">
-              <h3 className="font-medium mb-2">Discount coupon:</h3>
+              <h3 className="font-medium mb-2">ডিসকাউন্ট কুপন:</h3>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Enter code"
+                  placeholder="কুপন কোড লিখুন"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   className="flex-1"
                 />
-                <Button variant="outline">Copy</Button>
+                <Button variant="outline">প্রয়োগ করুন</Button>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex gap-4 mb-6">
               <Button className="flex-1 h-12">
-                Buy Now
+                এখনই কিনুন
               </Button>
               <Button variant="outline" className="flex-1 h-12">
                 <ShoppingCart className="w-4 h-4 mr-2" />
-                Add to Cart
+                কার্টে যোগ করুন
               </Button>
             </div>
 
             {/* Wishlist */}
             <Button variant="ghost" className="w-full">
               <Heart className="w-4 h-4 mr-2" />
-              Add to Wishlist
+              প্রিয় তালিকায় যোগ করুন
             </Button>
           </div>
         </div>
@@ -270,10 +346,10 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
 
         {/* Description */}
         <div className="mb-12">
-          <h2 className="text-xl font-bold mb-4">Description</h2>
+          <h2 className="text-xl font-bold mb-4">বিবরণ</h2>
           <div className="prose max-w-none">
             <p className="whitespace-pre-line text-muted-foreground">
-              {product.description}
+              {product.description || 'এই পণ্যের কোন বিশদ বিবরণ নেই।'}
             </p>
           </div>
         </div>
@@ -282,7 +358,7 @@ Cloud Rain Humidifier আপনার রুমকে দেয় নিখু�
 
         {/* Recommended Products */}
         <div>
-          <h2 className="text-xl font-bold mb-6">Recommended for you</h2>
+          <h2 className="text-xl font-bold mb-6">আপনার জন্য প্রস্তাবিত</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {recommendedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />

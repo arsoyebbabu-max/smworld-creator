@@ -1,10 +1,17 @@
-import { Search, ShoppingCart, User, Menu, Heart, Globe } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Heart, ShoppingCart, User, Menu, Search, Globe, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
+  const { user, isAdmin, signOut } = useAuth();
+  
+  const handleLogout = async () => {
+    await signOut();
+  };
   return (
     <header className="bg-primary text-primary-foreground sticky top-0 z-50 shadow-lg">
       {/* Top Bar */}
@@ -19,13 +26,30 @@ const Header = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" className="text-xs hover:bg-white/10">
                 <Globe className="w-3 h-3 mr-1" />
-                Language
+                বাংলা
               </Button>
-              <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-xs hover:bg-white/10">
-                  লগ আউট
-                </Button>
-              </Link>
+              
+              {user ? (
+                <div className="flex items-center gap-4">
+                  <span className="text-xs">স্বাগতম, {user.email?.split('@')[0]}</span>
+                  {isAdmin && (
+                    <Link to="/admin">
+                      <Button variant="ghost" size="sm" className="text-xs hover:bg-white/10">
+                        অ্যাডমিন প্যানেল
+                      </Button>
+                    </Link>
+                  )}
+                  <Button variant="ghost" size="sm" className="text-xs hover:bg-white/10" onClick={handleLogout}>
+                    লগআউট
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm" className="text-xs hover:bg-white/10">
+                    লগইন
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -70,7 +94,7 @@ const Header = () => {
                 0
               </Badge>
             </Button>
-            <Link to="/login">
+            <Link to="/orders">
               <Button variant="ghost" size="sm">
                 <User className="w-5 h-5" />
               </Button>
