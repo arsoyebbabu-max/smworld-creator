@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
+import Footer from "@/components/Footer";
 import heroBanner from "@/assets/hero-banner.jpg";
 import humidifierImg from "@/assets/humidifier.jpg";
 import smartwatchImg from "@/assets/smartwatch.jpg";
@@ -225,6 +226,8 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };

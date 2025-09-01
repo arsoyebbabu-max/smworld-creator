@@ -1,7 +1,8 @@
-import { Search, ShoppingCart, User, Menu } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, Heart, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -16,8 +17,15 @@ const Header = () => {
               <span>ফ্রি ডেলিভারি</span>
             </div>
             <div className="flex items-center gap-4">
-              <span>Language</span>
-              <span>লগ আউট</span>
+              <Button variant="ghost" size="sm" className="text-xs hover:bg-white/10">
+                <Globe className="w-3 h-3 mr-1" />
+                Language
+              </Button>
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="text-xs hover:bg-white/10">
+                  লগ আউট
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -27,7 +35,7 @@ const Header = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
               <span className="text-primary font-bold text-lg">SM</span>
             </div>
@@ -35,7 +43,7 @@ const Header = () => {
               <h1 className="font-bold text-xl">SM World</h1>
               <p className="text-xs opacity-90">Store</p>
             </div>
-          </div>
+          </Link>
 
           {/* Search Bar - Hidden on mobile */}
           <div className="hidden md:flex flex-1 max-w-md mx-8">
@@ -49,16 +57,24 @@ const Header = () => {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" className="relative">
+              <Heart className="w-5 h-5" />
+              <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
+                0
+              </Badge>
+            </Button>
             <Button variant="ghost" size="sm" className="relative">
               <ShoppingCart className="w-5 h-5" />
               <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
                 0
               </Badge>
             </Button>
-            <Button variant="ghost" size="sm">
-              <User className="w-5 h-5" />
-            </Button>
+            <Link to="/login">
+              <Button variant="ghost" size="sm">
+                <User className="w-5 h-5" />
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm" className="md:hidden">
               <Menu className="w-5 h-5" />
             </Button>
