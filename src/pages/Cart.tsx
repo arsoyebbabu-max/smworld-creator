@@ -32,28 +32,7 @@ interface CartItem {
 }
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: '1',
-      name: 'স্মার্ট ওয়াচ প্রো ম্যাক্স',
-      price: 9500,
-      originalPrice: 12500,
-      quantity: 1,
-      image: smartwatchImg,
-      size: '44mm',
-      color: 'কালো'
-    },
-    {
-      id: '2',
-      name: 'আল্ট্রাসনিক এয়ার হিউমিডিফায়ার',
-      price: 4800,
-      originalPrice: 6500,
-      quantity: 2,
-      image: humidifierImg,
-      size: 'মাঝারি',
-      color: 'সাদা'
-    }
-  ]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);

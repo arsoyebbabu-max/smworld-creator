@@ -9,20 +9,26 @@ interface ProductCardProps {
     id: string;
     name: string;
     price: number;
-    originalPrice?: number;
-    discount?: number;
-    rating: number;
-    reviews: number;
-    image: string;
-    tag?: string;
-    isNew?: boolean;
+    discount_price?: number;
+    image_urls?: string[];
+    stock_quantity: number;
+    categories?: {
+      id: string;
+      name: string;
+    };
+    [key: string]: any;
   };
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const discountPercent = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const discountPercent = product.discount_price 
+    ? Math.round(((product.price - product.discount_price) / product.price) * 100)
     : 0;
+    
+  const finalPrice = product.discount_price || product.price;
+  const productImage = product.image_urls && product.image_urls.length > 0 
+    ? product.image_urls[0] 
+    : product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400';
 
   return (
     <Link to={`/product/${product.id}`}>
@@ -30,15 +36,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
         {/* Product Image */}
         <div className="relative aspect-square bg-gray-50">
           <img
-            src={product.image}
+            src={productImage}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
           
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {product.isNew && (
-              <Badge className="bg-success text-success-foreground text-xs">New</Badge>
+            {product.stock_quantity > 50 && (
+              <Badge className="bg-success text-success-foreground text-xs">নতুন</Badge>
             )}
             {discountPercent > 0 && (
               <Badge className="bg-primary text-primary-foreground text-xs">
@@ -75,24 +81,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <Star
                   key={i}
                   className={`w-3 h-3 ${
-                    i < Math.floor(product.rating)
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-300"
+                    i < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
                   }`}
                 />
               ))}
             </div>
             <span className="text-xs text-muted-foreground">
-              ({product.reviews})
+              (4.5)
             </span>
           </div>
 
           {/* Price */}
           <div className="flex items-center gap-2 mb-3">
-            <span className="font-bold text-primary">৳ {product.price}</span>
-            {product.originalPrice && (
+            <span className="font-bold text-primary">৳ {finalPrice}</span>
+            {product.discount_price && (
               <span className="text-xs text-muted-foreground line-through">
-                ৳ {product.originalPrice}
+                ৳ {product.price}
               </span>
             )}
           </div>
@@ -107,7 +111,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               // Handle buy now action
             }}
           >
-            Buy Now
+            এখনই কিনুন
           </Button>
         </div>
       </Card>
