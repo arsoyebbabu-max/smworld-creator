@@ -10,8 +10,13 @@ interface ProductCardProps {
     name: string;
     price: number;
     discount_price?: number;
+    originalPrice?: number;
     image_urls?: string[];
-    stock_quantity: number;
+    image?: string;
+    stock_quantity?: number;
+    rating?: number;
+    reviews?: number;
+    isNew?: boolean;
     categories?: {
       id: string;
       name: string;
@@ -23,7 +28,9 @@ interface ProductCardProps {
 const ProductCard = ({ product }: ProductCardProps) => {
   const discountPercent = product.discount_price 
     ? Math.round(((product.price - product.discount_price) / product.price) * 100)
-    : 0;
+    : product.originalPrice 
+      ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+      : 0;
     
   const finalPrice = product.discount_price || product.price;
   const productImage = product.image_urls && product.image_urls.length > 0 
@@ -43,7 +50,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {product.stock_quantity > 50 && (
+            {(product.stock_quantity && product.stock_quantity > 50) || product.isNew && (
               <Badge className="bg-success text-success-foreground text-xs">নতুন</Badge>
             )}
             {discountPercent > 0 && (
@@ -81,22 +88,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <Star
                   key={i}
                   className={`w-3 h-3 ${
-                    i < 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                    i < Math.floor(product.rating || 4) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
                   }`}
                 />
               ))}
             </div>
             <span className="text-xs text-muted-foreground">
-              (4.5)
+              ({product.reviews || 'নতুন'})
             </span>
           </div>
 
           {/* Price */}
           <div className="flex items-center gap-2 mb-3">
             <span className="font-bold text-primary">৳ {finalPrice}</span>
-            {product.discount_price && (
+            {(product.discount_price || product.originalPrice) && (
               <span className="text-xs text-muted-foreground line-through">
-                ৳ {product.price}
+                ৳ {product.discount_price ? product.price : product.originalPrice}
               </span>
             )}
           </div>

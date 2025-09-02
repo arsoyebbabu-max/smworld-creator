@@ -38,22 +38,7 @@ const UserDashboard = () => {
     { id: 'settings', icon: Settings, label: 'সেটিংস', color: 'text-gray-600' }
   ];
 
-  const recentOrders = [
-    {
-      id: 'ORD-2024-001',
-      status: 'ডেলিভারি হয়েছে',
-      total: 2500,
-      date: '২০২৪-০১-১৫',
-      items: 2
-    },
-    {
-      id: 'ORD-2024-002',
-      status: 'প্রসেসিং',
-      total: 4200,
-      date: '২০২৪-০১-২০',
-      items: 1
-    }
-  ];
+  const recentOrders: any[] = [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,15 +91,15 @@ const UserDashboard = () => {
             {/* Quick Stats */}
             <div className="mt-6 space-y-4">
               <Card className="text-center p-4">
-                <div className="text-2xl font-bold text-primary">৫</div>
+                <div className="text-2xl font-bold text-primary">০</div>
                 <div className="text-sm text-muted-foreground">মোট অর্ডার</div>
               </Card>
               <Card className="text-center p-4">
-                <div className="text-2xl font-bold text-green-600">৳ ১২,৫০০</div>
+                <div className="text-2xl font-bold text-green-600">৳ ০</div>
                 <div className="text-sm text-muted-foreground">মোট খরচ</div>
               </Card>
               <Card className="text-center p-4">
-                <div className="text-2xl font-bold text-purple-600">১২</div>
+                <div className="text-2xl font-bold text-purple-600">০</div>
                 <div className="text-sm text-muted-foreground">উইশলিস্ট</div>
               </Card>
             </div>
@@ -142,22 +127,32 @@ const UserDashboard = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {recentOrders.map((order) => (
-                          <div key={order.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                            <div>
-                              <div className="font-medium">{order.id}</div>
-                              <div className="text-sm text-muted-foreground">{order.date}</div>
-                              <Badge variant={order.status === 'ডেলিভারি হয়েছে' ? 'default' : 'secondary'}>
-                                {order.status}
-                              </Badge>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-bold">৳ {order.total.toLocaleString()}</div>
-                              <div className="text-sm text-muted-foreground">{order.items} টি আইটেম</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                         {recentOrders.length === 0 ? (
+                           <div className="text-center py-8">
+                             <Package className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                             <p className="text-muted-foreground">আপনার কোনো অর্ডার নেই</p>
+                             <Link to="/shop">
+                               <Button className="mt-4" variant="outline">কেনাকাটা শুরু করুন</Button>
+                             </Link>
+                           </div>
+                         ) : (
+                           recentOrders.map((order) => (
+                             <div key={order.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                               <div>
+                                 <div className="font-medium">{order.id}</div>
+                                 <div className="text-sm text-muted-foreground">{order.date}</div>
+                                 <Badge variant={order.status === 'ডেলিভারি হয়েছে' ? 'default' : 'secondary'}>
+                                   {order.status}
+                                 </Badge>
+                               </div>
+                               <div className="text-right">
+                                 <div className="font-bold">৳ {order.total.toLocaleString()}</div>
+                                 <div className="text-sm text-muted-foreground">{order.items} টি আইটেম</div>
+                               </div>
+                             </div>
+                           ))
+                         )}
+                       </div>
                       <Link to="/orders">
                         <Button className="w-full mt-4" variant="outline">
                           সব অর্ডার দেখুন
@@ -176,22 +171,24 @@ const UserDashboard = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="text-center space-y-4">
-                        <div className="text-4xl font-bold text-primary">১,২৫০</div>
+                        <div className="text-4xl font-bold text-primary">০</div>
                         <div className="text-muted-foreground">পয়েন্ট বাকি আছে</div>
                         
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>পরবর্তী লেভেল</span>
-                            <span>৭৫০ পয়েন্ট</span>
+                            <span>১০০ পয়েন্ট</span>
                           </div>
                           <div className="w-full bg-muted rounded-full h-2">
-                            <div className="bg-primary h-2 rounded-full" style={{ width: '62%' }}></div>
+                            <div className="bg-primary h-2 rounded-full" style={{ width: '0%' }}></div>
                           </div>
                         </div>
 
-                        <Button className="w-full">
-                          পয়েন্ট ব্যবহার করুন
-                        </Button>
+                        <Link to="/shop">
+                          <Button className="w-full">
+                            শপিং করে পয়েন্ট অর্জন করুন
+                          </Button>
+                        </Link>
                       </div>
                     </CardContent>
                   </Card>
