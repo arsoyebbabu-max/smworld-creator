@@ -96,8 +96,22 @@ const Checkout = () => {
   };
 
   const fetchDeliveryConfig = async () => {
-    // This would typically fetch from admin settings
-    // For now using default values
+    try {
+      const { data, error } = await supabase
+        .from("delivery_config")
+        .select("*")
+        .single();
+
+      if (data && !error) {
+        setDeliveryConfig({
+          dhaka_charge: data.dhaka_charge,
+          outside_dhaka_charge: data.outside_dhaka_charge,
+          free_delivery_threshold: data.free_delivery_threshold
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching delivery config:", error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -18,21 +18,26 @@ const MobileBottomNav = () => {
     { icon: ShoppingBag, label: "শপ", path: "/shop" },
     { icon: Heart, label: "পছন্দ", path: "/wishlist", badge: getWishlistCount() },
     { icon: ShoppingCart, label: "কার্ট", path: "/cart", badge: getCartCount() },
-    { icon: MessageSquare, label: "মেসেজ", path: "/dashboard" },
-    { icon: User, label: "একাউন্ট", path: user ? "/dashboard" : "/auth" },
+    { icon: MessageSquare, label: "মেসেজ", path: "/messages" },
+    { icon: User, label: "একাউন্ট", path: "/dashboard" },
   ];
+
+  const accountPath = user ? '/dashboard' : '/auth';
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border md:hidden z-50">
       <div className="grid grid-cols-6 py-2">
-        {navItems.map((item) => {
+        {navItems.map((item, index) => {
           const Icon = item.icon;
-          const active = isActive(item.path);
+          // Use accountPath for the Account item and create unique keys
+          const path = item.path === '/dashboard' ? accountPath : item.path;
+          const uniqueKey = `${item.path}-${index}`;
+          const active = isActive(path);
           
           return (
             <Link
-              key={item.path}
-              to={item.path}
+              key={uniqueKey}
+              to={path}
               className={`flex flex-col items-center py-2 px-1 text-xs relative ${
                 active
                   ? "text-primary"

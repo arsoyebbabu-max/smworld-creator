@@ -142,6 +142,33 @@ export type Database = {
         }
         Relationships: []
       }
+      delivery_config: {
+        Row: {
+          created_at: string | null
+          dhaka_charge: number
+          free_delivery_threshold: number
+          id: string
+          outside_dhaka_charge: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dhaka_charge?: number
+          free_delivery_threshold?: number
+          id?: string
+          outside_dhaka_charge?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dhaka_charge?: number
+          free_delivery_threshold?: number
+          id?: string
+          outside_dhaka_charge?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           created_at: string

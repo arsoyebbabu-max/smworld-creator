@@ -36,15 +36,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
 
         // Check admin status when user changes
         if (session?.user) {
-          setTimeout(() => {
-            checkAdminStatus(session.user.id);
+          setTimeout(async () => {
+            const adminStatus = await checkAdminStatus(session.user.id);
+            
+            // Redirect admin users to admin dashboard on login
+            if (event === 'SIGNED_IN' && adminStatus && window.location.pathname === '/auth') {
+              window.location.href = '/admin';
+            }
           }, 0);
         } else {
           setIsAdmin(false);
@@ -78,11 +83,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       if (!error && data) {
         setIsAdmin(true);
+        return true;
       } else {
         setIsAdmin(false);
+        return false;
       }
     } catch (error) {
       setIsAdmin(false);
+      return false;
     }
   };
 
