@@ -7,13 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import MobileBottomNav from "@/components/MobileBottomNav";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "@/hooks/use-toast";
 import smartwatchImg from "@/assets/smartwatch.jpg";
 
 const Cart = () => {
   const { cartItems, loading, updateCartItemQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState("");
   
@@ -35,7 +37,7 @@ const Cart = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header />
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
@@ -44,13 +46,14 @@ const Cart = () => {
           </div>
         </div>
         <Footer />
+        <MobileBottomNav />
       </div>
     );
   }
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
@@ -65,12 +68,13 @@ const Cart = () => {
           </div>
         </div>
         <Footer />
+        <MobileBottomNav />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Header />
       
       <div className="container mx-auto px-4 py-6">
@@ -206,7 +210,11 @@ const Cart = () => {
                   </div>
                 </div>
 
-                <Button className="w-full h-12">
+                <Button 
+                  onClick={() => navigate("/checkout")}
+                  className="w-full h-12"
+                  disabled={cartItems.length === 0}
+                >
                   চেকআউট (৳ {total.toLocaleString()})
                 </Button>
 
@@ -227,6 +235,7 @@ const Cart = () => {
       </div>
 
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 };

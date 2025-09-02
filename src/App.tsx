@@ -12,6 +12,8 @@ import Signup from "./pages/Signup";
 import OrderTracking from "./pages/OrderTracking";
 import UserDashboard from "./pages/UserDashboard";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
 import Wishlist from "./pages/Wishlist";
 import AdminDashboard from "./pages/EnhancedAdminDashboard";
 import NotFound from "./pages/NotFound";
@@ -36,6 +38,8 @@ const App = () => (
             <Route path="/orders" element={<OrderTracking />} />
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/admin" element={<AdminDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
