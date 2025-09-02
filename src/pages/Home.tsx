@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
 import Footer from "@/components/Footer";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import { useProducts } from "@/hooks/useProducts";
 import heroBanner from "@/assets/hero-banner.jpg";
 
@@ -33,54 +34,54 @@ const Home = () => {
   const exploreLatestProducts = products.slice(4, 8);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Header />
       
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary via-primary to-purple-600">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div className="text-white space-y-6">
-              <Badge className="bg-white text-primary">নতুন আগমন</Badge>
-              <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+        <div className="container mx-auto px-4 py-6 md:py-12">
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
+            <div className="text-white space-y-4 md:space-y-6">
+              <Badge className="bg-white text-primary text-xs">নতুন আগমন</Badge>
+              <h1 className="text-2xl md:text-5xl font-bold leading-tight">
                 সেরা গ্যাজেট এবং 
-                <span className="block text-yellow-300">অসাধারণ অফার</span>
+                <span className="block text-pink-300">অসাধারণ অফার</span>
               </h1>
-              <p className="text-lg opacity-90">
+              <p className="text-sm md:text-lg opacity-90">
                 উন্নত প্রযুক্তির পণ্য এবং আকর্ষণীয় দামে। আজই কেনাকাটা শুরু করুন।
               </p>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                 <Link to="/shop">
-                  <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                  <Button size="sm" className="w-full sm:w-auto bg-white text-primary hover:bg-gray-100">
                     এখনই কিনুন
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary">
+                <Button size="sm" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-primary">
                   অফার দেখুন
                 </Button>
               </div>
               
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-8">
+              {/* Stats - More compact on mobile */}
+              <div className="grid grid-cols-3 gap-2 md:gap-4 pt-4 md:pt-8">
                 <div className="text-center">
-                  <div className="text-2xl font-bold">{products.length}+</div>
-                  <div className="text-sm opacity-75">পণ্য</div>
+                  <div className="text-lg md:text-2xl font-bold">{products.length}+</div>
+                  <div className="text-xs md:text-sm opacity-75">পণ্য</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">১০০+</div>
-                  <div className="text-sm opacity-75">সন্তুষ্ট কাস্টমার</div>
+                  <div className="text-lg md:text-2xl font-bold">১০০+</div>
+                  <div className="text-xs md:text-sm opacity-75">কাস্টমার</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">২৪/৭</div>
-                  <div className="text-sm opacity-75">সাপোর্ট</div>
+                  <div className="text-lg md:text-2xl font-bold">২৪/৭</div>
+                  <div className="text-xs md:text-sm opacity-75">সাপোর্ট</div>
                 </div>
               </div>
             </div>
-            <div className="relative">
+            <div className="relative order-first md:order-last">
               <img
                 src={heroBanner}
                 alt="Hero Banner"
-                className="w-full h-64 md:h-80 object-cover rounded-lg shadow-2xl"
+                className="w-full h-48 md:h-80 object-cover rounded-lg shadow-2xl"
               />
             </div>
           </div>
@@ -206,6 +207,7 @@ const Home = () => {
       </section>
 
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 };

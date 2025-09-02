@@ -13,8 +13,9 @@ import OrderTracking from "./pages/OrderTracking";
 import UserDashboard from "./pages/UserDashboard";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/EnhancedAdminDashboard";
 import NotFound from "./pages/NotFound";
+import MobileBottomNavWrapper from "./components/MobileBottomNavWrapper";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <MobileBottomNavWrapper />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
