@@ -1,85 +1,66 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import { 
-  Plus, 
-  Minus, 
-  Trash2, 
-  ShoppingBag, 
-  CreditCard, 
-  Truck, 
-  Shield, 
-  ArrowLeft,
-  Tag
-} from 'lucide-react';
-import smartwatchImg from '@/assets/smartwatch.jpg';
-import humidifierImg from '@/assets/humidifier.jpg';
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice: number;
-  quantity: number;
-  image: string;
-  size?: string;
-  color?: string;
-}
+import { useState } from "react";
+import { Heart, Star, Trash2, Plus, Minus, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Link } from "react-router-dom";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "@/hooks/use-toast";
+import smartwatchImg from "@/assets/smartwatch.jpg";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
-
-  const updateQuantity = (id: string, change: number) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
+  const { cartItems, loading, updateCartItemQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState("");
+  
+  const subtotal = getCartTotal();
+  const discount = appliedCoupon ? subtotal * 0.1 : 0; // 10% discount if coupon applied
+  const shipping = subtotal > 500 ? 0 : 99;
+  const total = subtotal - discount + shipping;
 
   const applyCoupon = () => {
-    if (couponCode.toLowerCase() === 'welcome20') {
-      setAppliedCoupon('WELCOME20 - ২০% ছাড়');
-      setCouponCode('');
-    } else {
-      alert('অবৈধ কুপন কোড');
+    if (couponCode.trim()) {
+      setAppliedCoupon(couponCode);
+      setCouponCode("");
+      toast({
+        title: "কুপন প্রয়োগ সফল!",
+        description: "১০% ছাড় প্রয়োগ করা হয়েছে।",
+      });
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const discount = appliedCoupon ? subtotal * 0.2 : 0;
-  const shipping = subtotal > 1000 ? 0 : 100;
-  const total = subtotal - discount + shipping;
-
-  const totalSavings = cartItems.reduce((sum, item) => 
-    sum + ((item.originalPrice - item.price) * item.quantity), 0
-  );
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-4" />
+            <p>লোড হচ্ছে...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="container mx-auto px-4 py-12">
-          <div className="text-center space-y-6">
-            <ShoppingBag className="w-24 h-24 mx-auto text-muted-foreground" />
-            <h2 className="text-2xl font-bold">আপনার কার্ট খালি</h2>
-            <p className="text-muted-foreground">কিছু পণ্য যোগ করুন এবং কেনাকাটা শুরু করুন</p>
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">আপনার কার্ট খালি</h1>
+            <p className="text-muted-foreground mb-6">এখনো কোনো পণ্য যোগ করেননি</p>
             <Link to="/shop">
-              <Button size="lg">কেনাকাটা শুরু করুন</Button>
+              <Button>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                কেনাকাটা করুন
+              </Button>
             </Link>
           </div>
         </div>
@@ -93,177 +74,150 @@ const Cart = () => {
       <Header />
       
       <div className="container mx-auto px-4 py-6">
-        {/* Back Button */}
-        <div className="mb-6">
-          <Link to="/shop">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              কেনাকাটা চালিয়ে যান
-            </Button>
-          </Link>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Link to="/shop">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                কেনাকাটা চালিয়ে যান
+              </Button>
+            </Link>
+            <h1 className="text-2xl font-bold">শপিং কার্ট ({cartItems.length})</h1>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={clearCart}
+            className="text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            সব সরান
+          </Button>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShoppingBag className="w-5 h-5" />
-                  শপিং কার্ট ({cartItems.length} টি আইটেম)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg bg-muted"
-                    />
-                    
-                    <div className="flex-1">
-                      <h3 className="font-medium mb-2">{item.name}</h3>
-                      
-                      <div className="flex gap-4 text-sm text-muted-foreground mb-3">
-                        {item.size && <span>সাইজ: {item.size}</span>}
-                        {item.color && <span>রঙ: {item.color}</span>}
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.id, -1)}
-                            disabled={item.quantity <= 1}
-                          >
-                            <Minus className="w-3 h-3" />
-                          </Button>
-                          <span className="w-8 text-center">{item.quantity}</span>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => updateQuantity(item.id, 1)}
-                          >
-                            <Plus className="w-3 h-3" />
-                          </Button>
+          <div className="lg:col-span-2 space-y-4">
+            {cartItems.map((item) => {
+              const itemPrice = item.products.discount_price || item.products.price;
+              const itemImage = item.products.image_urls?.length ? item.products.image_urls[0] : smartwatchImg;
+              
+              return (
+                <Card key={item.id}>
+                  <CardContent className="p-4">
+                    <div className="flex gap-4">
+                      <img
+                        src={itemImage}
+                        alt={item.products.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="font-medium mb-2">{item.products.name}</h3>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                          {item.size && <span>সাইজ: {item.size}</span>}
+                          {item.color && <span>রং: {item.color}</span>}
                         </div>
-                        
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}
+                            >
+                              <Minus className="w-4 h-4" />
+                            </Button>
+                            <span className="min-w-8 text-center">{item.quantity}</span>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}
+                            >
+                              <Plus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold">৳ {(itemPrice * item.quantity).toLocaleString()}</p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-destructive hover:bg-destructive/10 p-1 h-6"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="text-right">
-                      <div className="font-bold text-lg">৳ {(item.price * item.quantity).toLocaleString()}</div>
-                      <div className="text-sm text-muted-foreground line-through">
-                        ৳ {(item.originalPrice * item.quantity).toLocaleString()}
-                      </div>
-                      <Badge variant="secondary" className="mt-1">
-                        {Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% ছাড়
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Coupon Section */}
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Tag className="w-5 h-5" />
-                  কুপন কোড
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="কুপন কোড লিখুন"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                  />
-                  <Button onClick={applyCoupon} disabled={!couponCode.trim()}>
-                    প্রয়োগ করুন
-                  </Button>
-                </div>
-                {appliedCoupon && (
-                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="text-green-800 font-medium">✅ {appliedCoupon}</div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-6">
+          <div className="lg:sticky lg:top-6 lg:self-start">
+            <Card>
               <CardHeader>
                 <CardTitle>অর্ডার সামারি</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="কুপন কোড"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button variant="outline" onClick={applyCoupon}>
+                    প্রয়োগ
+                  </Button>
+                </div>
+                
+                {appliedCoupon && (
+                  <div className="bg-success/10 text-success p-2 rounded-lg text-sm">
+                    কুপন "{appliedCoupon}" প্রয়োগ হয়েছে!
+                  </div>
+                )}
+
+                <Separator />
+
+                <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>সাবটোটাল</span>
+                    <span>সাবটোটাল:</span>
                     <span>৳ {subtotal.toLocaleString()}</span>
                   </div>
-                  
                   {discount > 0 && (
-                    <div className="flex justify-between text-green-600">
-                      <span>ডিসকাউন্ট</span>
+                    <div className="flex justify-between text-success">
+                      <span>ছাড়:</span>
                       <span>-৳ {discount.toLocaleString()}</span>
                     </div>
                   )}
-                  
                   <div className="flex justify-between">
-                    <span>ডেলিভারি চার্জ</span>
-                    <span className={shipping === 0 ? 'text-green-600' : ''}>
-                      {shipping === 0 ? 'ফ্রি' : `৳ ${shipping}`}
-                    </span>
+                    <span>ডেলিভারি:</span>
+                    <span>{shipping === 0 ? 'ফ্রি' : `৳ ${shipping}`}</span>
                   </div>
-                  
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>মোট</span>
-                      <span>৳ {total.toLocaleString()}</span>
-                    </div>
+                  <Separator />
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>মোট:</span>
+                    <span>৳ {total.toLocaleString()}</span>
                   </div>
-
-                  {totalSavings > 0 && (
-                    <div className="bg-green-50 p-3 rounded-lg text-center">
-                      <div className="text-green-800 font-medium">
-                        🎉 আপনি সাশ্রয় করছেন ৳ {totalSavings.toLocaleString()}!
-                      </div>
-                    </div>
-                  )}
                 </div>
 
-                <Button className="w-full" size="lg">
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  চেকআউট করুন
+                <Button className="w-full h-12">
+                  চেকআউট (৳ {total.toLocaleString()})
                 </Button>
 
-                {/* Features */}
-                <div className="space-y-3 pt-4 border-t">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Truck className="w-4 h-4 text-green-600" />
-                    <span>ফ্রি ডেলিভারি ১০০০+ টাকায়</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <Shield className="w-4 h-4 text-blue-600" />
+                <div className="text-center space-y-2 pt-4">
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Heart className="w-4 h-4" />
                     <span>১০০% নিরাপদ পেমেন্ট</span>
                   </div>
-                  <div className="flex items-center gap-3 text-sm">
-                    <Tag className="w-4 h-4 text-purple-600" />
-                    <span>৭ দিন রিটার্ন গ্যারান্টি</span>
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Star className="w-4 h-4" />
+                    <span>দ্রুত ডেলিভারি</span>
                   </div>
                 </div>
               </CardContent>

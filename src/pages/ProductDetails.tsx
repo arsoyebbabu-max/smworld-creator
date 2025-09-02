@@ -10,6 +10,8 @@ import ProductCard from "@/components/ProductCard";
 import Footer from "@/components/Footer";
 import { useParams, Link } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 import { toast } from "@/hooks/use-toast";
 import humidifierImg from "@/assets/humidifier.jpg";
 import smartwatchImg from "@/assets/smartwatch.jpg";
@@ -17,6 +19,8 @@ import smartwatchImg from "@/assets/smartwatch.jpg";
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
   const { getProductById } = useProducts();
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -86,6 +90,51 @@ const ProductDetails = () => {
       </div>
     );
   }
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: `Check out this product: ${product.name}`,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.log('Error sharing:', error);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "লিংক কপি হয়েছে!",
+        description: "প্রোডাক্ট লিংক ক্লিপবোর্ডে কপি করা হয়েছে।",
+      });
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    await addToCart(product.id, quantity, selectedSize, selectedColor);
+  };
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+    const success = await addToCart(product.id, quantity, selectedSize, selectedColor);
+    if (success) {
+      // Navigate to cart or checkout
+      window.location.href = '/cart';
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!product) return;
+    
+    if (isInWishlist(product.id)) {
+      await removeFromWishlist(product.id);
+    } else {
+      await addToWishlist(product.id);
+    }
+  };
 
   const discountPercentage = product.discount_price 
     ? Math.round(((product.price - product.discount_price) / product.price) * 100)
@@ -157,6 +206,7 @@ const ProductDetails = () => {
               <Button
                 variant="ghost"
                 size="icon"
+                onClick={handleShare}
                 className="absolute top-4 right-4 bg-white/80 hover:bg-white"
               >
                 <Share className="w-4 h-4" />
@@ -325,19 +375,23 @@ const ProductDetails = () => {
 
             {/* Action Buttons */}
             <div className="flex gap-4 mb-6">
-              <Button className="flex-1 h-12">
+              <Button className="flex-1 h-12" onClick={handleBuyNow}>
                 এখনই কিনুন
               </Button>
-              <Button variant="outline" className="flex-1 h-12">
+              <Button variant="outline" className="flex-1 h-12" onClick={handleAddToCart}>
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 কার্টে যোগ করুন
               </Button>
             </div>
 
             {/* Wishlist */}
-            <Button variant="ghost" className="w-full">
-              <Heart className="w-4 h-4 mr-2" />
-              প্রিয় তালিকায় যোগ করুন
+            <Button 
+              variant="ghost" 
+              className={`w-full ${isInWishlist(product.id) ? 'text-red-600' : ''}`}
+              onClick={handleWishlistToggle}
+            >
+              <Heart className={`w-4 h-4 mr-2 ${isInWishlist(product.id) ? 'fill-red-600' : ''}`} />
+              {isInWishlist(product.id) ? 'প্রিয় তালিকা থেকে সরান' : 'প্রিয় তালিকায় যোগ করুন'}
             </Button>
           </div>
         </div>

@@ -35,6 +35,47 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_items: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          size: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity?: number
+          size?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          size?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
@@ -98,6 +139,39 @@ export type Database = {
           is_active?: boolean | null
           max_uses?: number | null
           minimum_amount?: number | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          created_at: string
+          from_user_id: string
+          id: string
+          is_read: boolean
+          message: string
+          subject: string
+          to_admin: boolean
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          from_user_id: string
+          id?: string
+          is_read?: boolean
+          message: string
+          subject: string
+          to_admin?: boolean
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          from_user_id?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          subject?: string
+          to_admin?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
@@ -256,6 +330,7 @@ export type Database = {
           phone: string | null
           updated_at: string
           user_id: string
+          user_number: number
         }
         Insert: {
           address?: string | null
@@ -265,6 +340,7 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id: string
+          user_number: number
         }
         Update: {
           address?: string | null
@@ -274,8 +350,38 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+          user_number?: number
         }
         Relationships: []
+      }
+      wishlist: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

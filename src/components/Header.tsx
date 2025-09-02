@@ -5,9 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
+import { useCart } from '@/hooks/useCart';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const Header = () => {
   const { user, isAdmin, signOut } = useAuth();
+  const { getCartCount } = useCart();
+  const { getWishlistCount } = useWishlist();
   
   const handleLogout = async () => {
     await signOut();
@@ -82,18 +86,24 @@ const Header = () => {
 
           {/* Right Actions */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="relative">
-              <Heart className="w-5 h-5" />
-              <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
-                12
-              </Badge>
-            </Button>
+            <Link to="/wishlist">
+              <Button variant="ghost" size="sm" className="relative">
+                <Heart className="w-5 h-5" />
+                {getWishlistCount() > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
+                    {getWishlistCount()}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
             <Link to="/cart">
               <Button variant="ghost" size="sm" className="relative">
                 <ShoppingCart className="w-5 h-5" />
-                <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
-                  2
-                </Badge>
+                {getCartCount() > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
+                    {getCartCount()}
+                  </Badge>
+                )}
               </Button>
             </Link>
             <Link to="/dashboard">

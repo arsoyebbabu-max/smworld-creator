@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useCart } from "@/hooks/useCart";
+import { useWishlist } from "@/hooks/useWishlist";
 
 interface ProductCardProps {
   product: {
@@ -26,16 +28,36 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  
   const discountPercent = product.discount_price 
     ? Math.round(((product.price - product.discount_price) / product.price) * 100)
     : product.originalPrice 
       ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
       : 0;
-    
+      
   const finalPrice = product.discount_price || product.price;
   const productImage = product.image_urls && product.image_urls.length > 0 
     ? product.image_urls[0] 
     : product.image || 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400';
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    await addToCart(product.id, 1);
+  };
+
+  const handleWishlistToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isInWishlist(product.id)) {
+      await removeFromWishlist(product.id);
+    } else {
+      await addToWishlist(product.id);
+    }
+  };
 
   return (
     <Link to={`/product/${product.id}`}>
@@ -64,14 +86,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Handle wishlist action
-            }}
+            onClick={handleWishlistToggle}
+            className={`absolute top-2 right-2 bg-white/80 hover:bg-white w-8 h-8 ${
+              isInWishlist(product.id) ? 'text-red-600' : ''
+            }`}
           >
-            <Heart className="w-4 h-4" />
+            <Heart className={`w-4 h-4 ${isInWishlist(product.id) ? 'fill-red-600' : ''}`} />
           </Button>
         </div>
 
@@ -112,11 +132,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <Button 
             className="w-full h-8 text-xs" 
             size="sm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Handle buy now action
-            }}
+            onClick={handleAddToCart}
           >
             এখনই কিনুন
           </Button>
