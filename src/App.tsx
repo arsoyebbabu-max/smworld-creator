@@ -18,6 +18,7 @@ import Wishlist from "./pages/Wishlist";
 import EnhancedAdminDashboard from "./pages/EnhancedAdminDashboard";
 import NotFound from "./pages/NotFound";
 import MobileBottomNavWrapper from "./components/MobileBottomNavWrapper";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +42,11 @@ const App = () => (
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/admin" element={<EnhancedAdminDashboard />} />
+            <Route path="/admin" element={
+              <ProtectedRoute requireAdmin={true}>
+                <EnhancedAdminDashboard />
+              </ProtectedRoute>
+            } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

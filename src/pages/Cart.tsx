@@ -51,7 +51,7 @@ const Cart = () => {
     );
   }
 
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0 && !loading) {
     return (
       <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header />

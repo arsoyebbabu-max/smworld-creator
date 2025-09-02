@@ -45,12 +45,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         if (session?.user) {
           setTimeout(async () => {
             const adminStatus = await checkAdminStatus(session.user.id);
+            console.log('Admin check:', { adminStatus, event, pathname: window.location.pathname, userId: session.user.id });
             
-            // Redirect admin users to admin dashboard on login
-            if (event === 'SIGNED_IN' && adminStatus && window.location.pathname === '/auth') {
+            // Redirect admin users to admin dashboard on login or initial load
+            if (adminStatus && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && 
+                (window.location.pathname === '/auth' || window.location.pathname === '/' || window.location.pathname === '/dashboard')) {
+              console.log('Redirecting to admin dashboard');
               window.location.href = '/admin';
             }
-          }, 0);
+          }, 100);
         } else {
           setIsAdmin(false);
         }
@@ -64,9 +67,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoading(false);
 
       if (session?.user) {
-        setTimeout(() => {
-          checkAdminStatus(session.user.id);
-        }, 0);
+        setTimeout(async () => {
+          const adminStatus = await checkAdminStatus(session.user.id);
+          console.log('Initial admin check:', { adminStatus, pathname: window.location.pathname, userId: session.user.id });
+          
+          // Redirect admin users if they're on user dashboard or home page
+          if (adminStatus && (window.location.pathname === '/dashboard' || window.location.pathname === '/')) {
+            console.log('Initial redirect to admin dashboard');
+            window.location.href = '/admin';
+          }
+        }, 100);
       }
     });
 
