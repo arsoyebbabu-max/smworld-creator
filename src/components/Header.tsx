@@ -85,16 +85,18 @@ const Header = () => {
             <Button variant="ghost" size="sm" className="relative">
               <Heart className="w-5 h-5" />
               <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
-                0
+                12
               </Badge>
             </Button>
-            <Button variant="ghost" size="sm" className="relative">
-              <ShoppingCart className="w-5 h-5" />
-              <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
-                0
-              </Badge>
-            </Button>
-            <Link to="/orders">
+            <Link to="/cart">
+              <Button variant="ghost" size="sm" className="relative">
+                <ShoppingCart className="w-5 h-5" />
+                <Badge className="absolute -top-2 -right-2 bg-white text-primary min-w-5 h-5 rounded-full text-xs">
+                  2
+                </Badge>
+              </Button>
+            </Link>
+            <Link to="/dashboard">
               <Button variant="ghost" size="sm">
                 <User className="w-5 h-5" />
               </Button>
