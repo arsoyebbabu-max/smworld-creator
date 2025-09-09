@@ -48,13 +48,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             const adminStatus = await checkAdminStatus(session.user.id);
             console.log('Admin check:', { adminStatus, event, pathname: window.location.pathname, userId: session.user.id });
             
-            // Force redirect admin users to admin dashboard on any login event
-            if (adminStatus && event === 'SIGNED_IN') {
-              console.log('Admin user signed in, redirecting to admin dashboard');
-              window.location.href = '/admin';
-            } else if (!adminStatus && event === 'SIGNED_IN' && window.location.pathname === '/auth') {
-              console.log('Regular user signed in, redirecting to user dashboard');
-              window.location.href = '/dashboard';
+            // Enhanced redirect logic for login events
+            if (event === 'SIGNED_IN') {
+              const currentPath = window.location.pathname;
+              if (adminStatus) {
+                // Admin users always go to admin dashboard
+                console.log('Admin user signed in, redirecting to admin dashboard');
+                window.location.href = '/admin';
+              } else {
+                // Regular users go to user dashboard (but not if they're already on main pages)
+                if (currentPath === '/auth' || currentPath === '/login') {
+                  console.log('Regular user signed in, redirecting to user dashboard');
+                  window.location.href = '/dashboard';
+                }
+              }
             }
           }, 200);
         } else {
@@ -75,14 +82,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           const adminStatus = await checkAdminStatus(session.user.id);
           console.log('Initial admin check:', { adminStatus, pathname: window.location.pathname, userId: session.user.id });
           
-          // Redirect admin users if they're on wrong pages
-          if (adminStatus && (window.location.pathname === '/dashboard' || window.location.pathname === '/' || window.location.pathname === '/auth')) {
-            console.log('Initial redirect to admin dashboard');
-            window.location.href = '/admin';
-          } else if (!adminStatus && window.location.pathname === '/admin') {
+          // Only redirect on initial load if user is in wrong place
+          const currentPath = window.location.pathname;
+          if (!adminStatus && currentPath === '/admin') {
             console.log('Non-admin user on admin page, redirecting to dashboard');
             window.location.href = '/dashboard';
           }
+          // Allow admin users to stay on any page they want on initial load
         }, 200);
       }
     });

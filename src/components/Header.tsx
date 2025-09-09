@@ -106,11 +106,26 @@ const Header = () => {
                 )}
               </Button>
             </Link>
-            <Link to="/dashboard">
-              <Button variant="ghost" size="sm">
-                <User className="w-5 h-5" />
-              </Button>
-            </Link>
+            
+            {/* Profile/Login Section */}
+            {user ? (
+              <Link to={isAdmin ? "/admin" : "/dashboard"}>
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <User className="w-5 h-5" />
+                  <span className="hidden sm:inline text-xs">
+                    {isAdmin ? 'অ্যাডমিন' : 'প্রোফাইল'}
+                  </span>
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/auth">
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <User className="w-5 h-5" />
+                  <span className="hidden sm:inline text-xs">লগইন করুন</span>
+                </Button>
+              </Link>
+            )}
+            
             <Button variant="ghost" size="sm" className="md:hidden">
               <Menu className="w-5 h-5" />
             </Button>

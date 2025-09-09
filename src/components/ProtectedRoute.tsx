@@ -26,7 +26,22 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
   }
 
   if (requireAdmin && !isAdmin) {
-    return <Navigate to="/dashboard" replace />;
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">অ্যাক্সেস নিষেধ</h2>
+          <p className="text-muted-foreground mb-4">
+            এই পেজটি দেখার জন্য অ্যাডমিন অনুমতি প্রয়োজন।
+          </p>
+          <button 
+            onClick={() => window.location.href = '/dashboard'}
+            className="bg-primary text-primary-foreground px-4 py-2 rounded-md"
+          >
+            ড্যাশবোর্ডে ফিরে যান
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;
