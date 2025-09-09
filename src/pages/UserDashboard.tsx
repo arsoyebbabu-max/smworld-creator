@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import { 
   User, 
   Settings, 
@@ -41,7 +42,7 @@ const UserDashboard = () => {
   const recentOrders: any[] = [];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Header />
       
       <div className="container mx-auto px-4 py-6">
@@ -332,6 +333,7 @@ const UserDashboard = () => {
       </div>
 
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 };

@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state changed:', { event, session: session?.user?.id });
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -47,13 +48,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             const adminStatus = await checkAdminStatus(session.user.id);
             console.log('Admin check:', { adminStatus, event, pathname: window.location.pathname, userId: session.user.id });
             
-            // Redirect admin users to admin dashboard on login or initial load
-            if (adminStatus && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && 
-                (window.location.pathname === '/auth' || window.location.pathname === '/' || window.location.pathname === '/dashboard')) {
-              console.log('Redirecting to admin dashboard');
+            // Force redirect admin users to admin dashboard on any login event
+            if (adminStatus && event === 'SIGNED_IN') {
+              console.log('Admin user signed in, redirecting to admin dashboard');
               window.location.href = '/admin';
+            } else if (!adminStatus && event === 'SIGNED_IN' && window.location.pathname === '/auth') {
+              console.log('Regular user signed in, redirecting to user dashboard');
+              window.location.href = '/dashboard';
             }
-          }, 100);
+          }, 200);
         } else {
           setIsAdmin(false);
         }
@@ -62,6 +65,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Getting existing session:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -71,12 +75,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           const adminStatus = await checkAdminStatus(session.user.id);
           console.log('Initial admin check:', { adminStatus, pathname: window.location.pathname, userId: session.user.id });
           
-          // Redirect admin users if they're on user dashboard or home page
-          if (adminStatus && (window.location.pathname === '/dashboard' || window.location.pathname === '/')) {
+          // Redirect admin users if they're on wrong pages
+          if (adminStatus && (window.location.pathname === '/dashboard' || window.location.pathname === '/' || window.location.pathname === '/auth')) {
             console.log('Initial redirect to admin dashboard');
             window.location.href = '/admin';
+          } else if (!adminStatus && window.location.pathname === '/admin') {
+            console.log('Non-admin user on admin page, redirecting to dashboard');
+            window.location.href = '/dashboard';
           }
-        }, 100);
+        }, 200);
       }
     });
 
@@ -85,20 +92,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkAdminStatus = async (userId: string) => {
     try {
+      console.log('Checking admin status for user:', userId);
+      
       const { data, error } = await supabase
         .from('admin_users')
         .select('role')
         .eq('user_id', userId)
         .single();
       
+      console.log('Admin check result:', { data, error });
+      
       if (!error && data) {
+        console.log('User is admin, setting isAdmin to true');
         setIsAdmin(true);
         return true;
       } else {
+        console.log('User is not admin, setting isAdmin to false');
         setIsAdmin(false);
         return false;
       }
     } catch (error) {
+      console.error('Error checking admin status:', error);
       setIsAdmin(false);
       return false;
     }
