@@ -250,6 +250,36 @@ export type Database = {
           },
         ]
       }
+      order_tracking: {
+        Row: {
+          created_at: string
+          id: string
+          location: string | null
+          message: string | null
+          order_id: string
+          status: string
+          tracking_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          message?: string | null
+          order_id: string
+          status: string
+          tracking_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          message?: string | null
+          order_id?: string
+          status?: string
+          tracking_number?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           coupon_code: string | null
@@ -378,6 +408,96 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_number?: number
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          id: string
+          is_approved: boolean | null
+          product_id: string
+          rating: number
+          review_text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_approved?: boolean | null
+          product_id: string
+          rating: number
+          review_text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_approved?: boolean | null
+          product_id?: string
+          rating?: number
+          review_text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      website_settings: {
+        Row: {
+          address: string | null
+          banner_images: string[] | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          facebook_url: string | null
+          id: string
+          instagram_url: string | null
+          logo_url: string | null
+          maintenance_mode: boolean | null
+          primary_color: string | null
+          secondary_color: string | null
+          site_description: string | null
+          site_name: string | null
+          twitter_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          banner_images?: string[] | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          logo_url?: string | null
+          maintenance_mode?: boolean | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          site_description?: string | null
+          site_name?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          banner_images?: string[] | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          facebook_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          logo_url?: string | null
+          maintenance_mode?: boolean | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          site_description?: string | null
+          site_name?: string | null
+          twitter_url?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

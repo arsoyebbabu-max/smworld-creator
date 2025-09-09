@@ -15,7 +15,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import Wishlist from "./pages/Wishlist";
-import EnhancedAdminDashboard from "./pages/EnhancedAdminDashboard";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import NotFound from "./pages/NotFound";
 import MobileBottomNavWrapper from "./components/MobileBottomNavWrapper";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -44,7 +44,7 @@ const App = () => (
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/admin" element={
               <ProtectedRoute requireAdmin={true}>
-                <EnhancedAdminDashboard />
+                <SuperAdminDashboard />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
